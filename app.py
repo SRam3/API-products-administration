@@ -1,4 +1,5 @@
 from flask import Flask
+from products import products
 
 #Objeto que vamos a configurar
 app = Flask(__name__)
