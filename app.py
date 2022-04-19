@@ -1,4 +1,6 @@
 
+import uuid
+
 from flask import Flask, jsonify, request
 from products import products
 from helpers import get_items_with_name
@@ -23,7 +25,7 @@ def getProducts():
 def getProduct(product_name):
     """Find the product and validate if product exist un products. 
        If exist,return the first value from productFound's list"""
-    productFound = [product for product in products if product['name'] == product_name]    
+    productFound = get_items_with_name(product_name)
     if (len(productFound) > 0):
         return jsonify({"product": productFound[0]}) 
     return jsonify({"message": "Product not found"})
@@ -33,14 +35,13 @@ def getProduct(product_name):
 def addProduct():
     """Create a new product: Using Postman POST request"""
     new_product = {
+        "id": str(uuid.uuid4()),
         "name": request.json["name"],
         "price": request.json["price"],
         "quantity": request.json["quantity"]
     }
     products.append(new_product)
     return jsonify({"message": "Product Added Succesfully", "products": products})
-
-#agregar columna que sea un ID y verificar que el ID no exista
 
 #Edit Product
 @app.route('/products/<string:product_name>', methods = ['PUT'])
@@ -64,7 +65,7 @@ def editProduct(product_name):
 @app.route('/products/<string:product_name>', methods = ['DELETE'])
 def deleteProduct(product_name):
     """Delete a product from its name: Using Postman DELETE"""
-    productFound = [product for product in products if product['name'] == product_name]
+    productFound = get_items_with_name(product_name)
     if (len(productFound) > 0):
         products.remove(productFound[0])
         return jsonify({
