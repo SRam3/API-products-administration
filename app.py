@@ -29,6 +29,20 @@ def get_product(product_name: str):
         return jsonify({"product": product_found[0]})
     return jsonify({"message": "Product not found"})
 
+@app.route("/products/<string:product_name>/description")
+def get_product_description(product_name: str):
+    """
+    Obtain product information
+
+    :param product_name: name to check
+    :type product_name: str
+    :return: First value from product_found's list
+    """
+    product_found = get_items_with_name(product_name)
+    if len(product_found) > 0:
+        return jsonify({"product": product_found[0]["description"]})
+    return jsonify({"message": "Product not found"})
+
 
 @app.route("/products", methods=["POST"])
 def add_product():
@@ -50,6 +64,23 @@ def edit_product(product_name):
         product_found[0]["name"] = request.json["name"]
         product_found[0]["price"] = request.json["price"]
         product_found[0]["quantity"] = request.json["quantity"]
+        product_found[0]["presentation"] = request.json["presentation"]
+        product_found[0]["description"] = request.json["description"]
+        return jsonify(
+            {
+                "message": "Product Updated",
+                "product": product_found[0],
+            }
+        )
+    return jsonify({"message": "Product not found"})
+
+
+@app.route("/products/<string:product_name>/price", methods=["PUT"])
+def edit_product_price(product_name):
+    """Update product price: Using Postman PUT request"""
+    product_found = get_items_with_name(product_name)
+    if len(product_found) > 0:
+        product_found[0]["price"] = request.json["price"]
         return jsonify(
             {
                 "message": "Product Updated",
