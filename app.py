@@ -45,19 +45,20 @@ def add_product():
 @app.route("/products/<string:product_name>", methods=["PUT"])
 def edit_product(product_name):
     """Update product properties, name, price or quantity: Using Postman PUT request"""
-    body = request.json
     product_found = get_items_with_name(product_name)
     if len(product_found) > 0:
-        product_found[0]["name"] = body["name"]
-        product_found[0]["price"] = body["price"]
-        product_found[0]["quantity"] = body["quantity"]
-        return jsonify({"message": "Product Updated", "product": product_found[0]})
+        product_found[0]["name"] = request.json["name"]
+        product_found[0]["price"] = request.json["price"]
+        product_found[0]["quantity"] = request.json["quantity"]
+        return jsonify(
+            {
+                "message": "Product Updated",
+                "product": product_found[0],
+            }
+        )
     return jsonify({"message": "Product not found"})
 
 
-# debe ser posible update solo un campo
-
-# Delete product
 @app.route("/products/<string:product_name>", methods=["DELETE"])
 def delete_product(product_name):
     """Delete a product from its name: Using Postman DELETE"""
@@ -68,7 +69,6 @@ def delete_product(product_name):
     return jsonify({"message": "Product not found"})
 
 
-# Total value of products in the store
 @app.route("/products/sum-stock")
 def sum_stock():
     """Calculate the total value of each element and returns the sum of them"""
@@ -77,6 +77,20 @@ def sum_stock():
     }
     return jsonify({"message": "The total value of your stock is:", "total": total})
 
+
+@app.route("/products/sum-stock/<string:product_name>")
+def sum_stock_by_name(product_name):
+    """Calculate the total value of each element and returns the sum of them"""
+    product_found = get_items_with_name(product_name)
+    if len(product_found) > 0:
+        total = product_found[0]["price"] * product_found[0]["quantity"]
+        return jsonify(
+            {
+                "message": f"The total value of {product_name} is:",
+                "total": total,
+            }
+        )
+    return jsonify({"message": "Product not found"})
 
 if __name__ == "__main__":
     app.run(debug=True)
